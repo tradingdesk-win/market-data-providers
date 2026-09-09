@@ -1,0 +1,175 @@
+id: sina
+name: 新浪财经
+description: 新浪财经中国大陆股票行情配置（实时/批量实时/K线）
+version: 1.1.0
+enabled: false
+supported_markets:
+- CN
+supported_types:
+- STOCK
+api:
+  base_url: https://quotes.sina.cn
+  timeout: 10s
+  max_retry: 3
+  retry_backoff: 1s
+  headers:
+    Referer: https://finance.sina.com.cn
+    User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
+      like Gecko) Chrome/120.0.0.0 Safari/537.36
+  kline:
+    endpoint: https://quotes.sina.cn/cn/api/json_v2.php/CN_MarketDataService.getKLineData
+    method: GET
+    date_format: '2006-01-02'
+    params:
+      symbol: '{{symbol}}'
+      scale: '{{period}}'
+      ma: 'no'
+      datalen: '1023'
+  realtime:
+    endpoint: https://hq.sinajs.cn/list={{symbol}}
+    method: GET
+  batch_realtime:
+    endpoint: https://hq.sinajs.cn/list={{symbols}}
+    method: GET
+    batch_size: 50
+response:
+  encoding: gbk
+  format: json
+  kline:
+    data_path: $
+    row_format: object
+    field_mapping:
+      timestamp:
+        source: day
+        type: time
+        formats:
+        - '2006-01-02 15:04:05'
+        - '2006-01-02'
+        day_close_time: '15:00:00'
+      open_px:
+        source: open
+        type: float
+      close_px:
+        source: close
+        type: float
+      high_px:
+        source: high
+        type: float
+      low_px:
+        source: low
+        type: float
+      volume:
+        source: volume
+        type: int
+      turnover_value:
+        source: amount
+        type: float
+  realtime:
+    data_path: $
+    row_format: text
+    text_parse:
+      line_separator: ;
+      prefix: var hq_str_
+      symbol_extract:
+        mode: prefix_to_equals
+        trim_prefix: true
+        to_lower: true
+      content_extract:
+        mode: quoted
+        quote_char: '"'
+      field_delimiter: ','
+      time_fields:
+        update_time:
+          date_index: 30
+          time_index: 31
+          formats:
+          - '2006-01-02 15:04:05'
+    field_mapping:
+      prod_name:
+        index: 0
+        type: string
+      open_px:
+        index: 1
+        type: float
+      pre_close_px:
+        index: 2
+        type: float
+      last_px:
+        index: 3
+        type: float
+      high_px:
+        index: 4
+        type: float
+      low_px:
+        index: 5
+        type: float
+    parser: sina_realtime
+  batch_realtime:
+    data_path: $
+    row_format: text
+    text_parse:
+      line_separator: ;
+      prefix: var hq_str_
+      symbol_extract:
+        mode: prefix_to_equals
+        trim_prefix: true
+        to_lower: true
+      content_extract:
+        mode: quoted
+        quote_char: '"'
+      field_delimiter: ','
+      time_fields:
+        update_time:
+          date_index: 30
+          time_index: 31
+          formats:
+          - '2006-01-02 15:04:05'
+    field_mapping:
+      prod_name:
+        index: 0
+        type: string
+      open_px:
+        index: 1
+        type: float
+      pre_close_px:
+        index: 2
+        type: float
+      last_px:
+        index: 3
+        type: float
+      high_px:
+        index: 4
+        type: float
+      low_px:
+        index: 5
+        type: float
+    parser: sina_realtime
+symbol:
+  output_template: '{{exchange}}{{code}}'
+period_mapping:
+  15m: '15'
+  30m: '30'
+  1h: '60'
+  2h: '120'
+  1d: '240'
+limits:
+  supported_periods:
+  - 15m
+  - 30m
+  - 1h
+  - 2h
+  - 1d
+  unsupported_message: 新浪数据源不支持周K/月K，请切换到选股宝或使用日K数据
+metadata:
+  disclaimer: '免责声明：本配置仅用于学习研究与个人使用示例，数据版权与接口使用权归原数据提供方所有。
+
+    请遵守对应站点/接口的服务条款、robots 与相关法律法规；严禁用于抓取牟利、转售或其他未经授权的商业用途。
+
+    若需长期/高频/商用，请购买合规数据服务并在产品中进行必要的风险提示与合规披露。
+
+    '
+  maintainer: TradingBea
+  verification_status: realtime_batch_daily_verified
+  last_verified_at: "2026-09-09"
+  verification_scope: "000001.SZ realtime and daily; 000001.SZ,600000.SS batch; other periods unverified"
+  test_symbol: 000001.SZ

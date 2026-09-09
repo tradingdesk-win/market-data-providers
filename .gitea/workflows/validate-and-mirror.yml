@@ -1,0 +1,40 @@
+name: Validate and mirror
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - run: python scripts/validate.py
+      - run: python -m unittest discover -s scripts -p 'test_*.py'
+  mirror:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Fast-forward public mirror
+        env:
+          MIRROR_TOKEN: ${{ secrets.MARKET_PROVIDERS_GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -eu
+          test -n "$MIRROR_TOKEN" || { echo 'Missing MARKET_PROVIDERS_GITHUB_TOKEN'; exit 1; }
+          askpass=$(mktemp)
+          trap 'rm -f "$askpass"' EXIT
+          printf '#!/bin/sh\ncase "$1" in *Username*) echo x-access-token;; *) printf "%%s\\n" "$MIRROR_TOKEN";; esac\n' > "$askpass"
+          chmod 700 "$askpass"
+          GIT_ASKPASS="$askpass" GIT_TERMINAL_PROMPT=0 git push https://github.com/tradingdesk-win/market-data-providers.git HEAD:refs/heads/main

@@ -1,0 +1,199 @@
+id: eastmoney
+name: 东方财富
+description: 东方财富中国大陆股票行情配置（实时/批量实时/K线）
+version: 1.1.0
+enabled: false
+api:
+  base_url: https://push2.eastmoney.com
+  timeout: 10s
+  max_retry: 3
+  retry_backoff: 1s
+  headers:
+    Referer: https://quote.eastmoney.com/
+    User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
+      like Gecko) Chrome/120.0.0.0 Safari/537.36
+  kline:
+    endpoint: https://push2his.eastmoney.com/api/qt/stock/kline/get
+    method: GET
+    date_format: '20060102'
+    params:
+      beg: '{{startDate|default:19900101}}'
+      end: '{{endDate|default:20500101}}'
+      fields1: f1,f2,f3,f4,f5,f6,f7,f8
+      fields2: f51,f52,f53,f54,f55,f56,f57,f61
+      fqt: '1'
+      klt: '{{period}}'
+      lmt: '{{limit|default:1000}}'
+      secid: '{{symbol}}'
+  realtime:
+    endpoint: https://push2.eastmoney.com/api/qt/stock/get
+    method: GET
+    params:
+      fields: f43,f44,f45,f46,f47,f48,f57,f58,f60,f169,f170
+      fltt: '2'
+      invt: '2'
+      secid: '{{symbol}}'
+  batch_realtime:
+    endpoint: https://push2.eastmoney.com/api/qt/ulist/get
+    method: GET
+    params:
+      fields: f12,f14,f2,f3,f4,f5,f6,f15,f16,f17,f18
+      np: '1'
+      pn: '1'
+      po: '1'
+      pz: '200'
+      secids: '{{symbols}}'
+    batch_size: 200
+response:
+  encoding: utf-8
+  format: json
+  kline:
+    data_path: data.klines
+    row_format: csv_string
+    csv_delimiter: ','
+    field_mapping:
+      close_px:
+        index: 2
+        type: float
+      high_px:
+        index: 3
+        type: float
+      low_px:
+        index: 4
+        type: float
+      open_px:
+        index: 1
+        type: float
+      timestamp:
+        type: time
+        formats:
+        - '2006-01-02 15:04:05'
+        - 2006-01-02 15:04
+        - '2006-01-02'
+        - '200601021504'
+        - '20060102'
+        day_close_time: '15:00:00'
+      turnover_value:
+        index: 6
+        type: float
+      volume:
+        index: 5
+        type: int
+        transform: multiply:100
+  realtime:
+    data_path: data
+    row_format: object
+    field_mapping:
+      amount:
+        source: f48
+        type: float
+      high_px:
+        source: f44
+        type: float
+      last_px:
+        source: f43
+        type: float
+      low_px:
+        source: f45
+        type: float
+      open_px:
+        source: f46
+        type: float
+      pre_close_px:
+        source: f60
+        type: float
+      prod_name:
+        source: f58
+        type: string
+      px_change:
+        source: f169
+        type: float
+      px_change_rate:
+        source: f170
+        type: float
+      volume:
+        source: f47
+        type: int
+        transform: multiply:100
+  batch_realtime:
+    data_path: data.diff
+    row_format: object
+    field_mapping:
+      amount:
+        source: f6
+        type: float
+      high_px:
+        source: f15
+        type: float
+        transform: divide:100
+      last_px:
+        source: f2
+        type: float
+        transform: divide:100
+      low_px:
+        source: f16
+        type: float
+        transform: divide:100
+      open_px:
+        source: f17
+        type: float
+        transform: divide:100
+      pre_close_px:
+        source: f18
+        type: float
+        transform: divide:100
+      prod_name:
+        source: f14
+        type: string
+      px_change:
+        source: f4
+        type: float
+        transform: divide:100
+      px_change_rate:
+        source: f3
+        type: float
+        transform: divide:100
+      symbol:
+        source: f12
+        type: string
+      volume:
+        source: f5
+        type: int
+        transform: multiply:100
+    symbol_reconstruct:
+      mode: prefix_lookup
+      prefixes:
+      - '1.'
+      - '0.'
+symbol:
+  output_template: '{{market}}.{{code}}'
+period_mapping:
+  1M: '103'
+  1d: '101'
+  1h: '60'
+  1w: '102'
+  15m: '15'
+  30m: '30'
+limits:
+  supported_periods:
+  - 15m
+  - 30m
+  - 1h
+  - 1d
+  - 1w
+  - 1M
+metadata:
+  disclaimer: '免责声明：本配置仅用于学习研究与个人使用示例，数据版权与接口使用权归原数据提供方所有。
+
+    请遵守对应站点/接口的服务条款与相关法律法规；严禁用于抓取牟利、转售或其他未经授权的商业用途。
+
+    '
+  maintainer: TradingBea
+  verification_status: realtime_batch_daily_verified
+  last_verified_at: "2026-09-09"
+  verification_scope: "000001.SZ realtime and daily; 000001.SZ,600000.SS batch; other periods unverified"
+  test_symbol: 000001.SZ
+supported_markets:
+- CN
+supported_types:
+- STOCK

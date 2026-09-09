@@ -1,0 +1,224 @@
+id: tencent
+name: 腾讯财经
+description: 腾讯财经中国大陆股票行情配置（实时/批量实时/K线）
+version: 1.1.0
+enabled: false
+supported_markets:
+- CN
+supported_types:
+- STOCK
+api:
+  base_url: https://web.ifzq.gtimg.cn
+  timeout: 10s
+  max_retry: 3
+  retry_backoff: 1s
+  headers:
+    Referer: https://gu.qq.com/
+    User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
+      like Gecko) Chrome/120.0.0.0 Safari/537.36
+  kline:
+    endpoint: https://web.ifzq.gtimg.cn/appstock/app/fqkline/get
+    method: GET
+    date_format: '2006-01-02'
+    params:
+      param: '{{symbol}},{{period}},{{startDate|default:}},{{endDate|default:}},{{limit|default:320}},qfq'
+  realtime:
+    endpoint: https://qt.gtimg.cn/q={{symbol}}
+    method: GET
+  batch_realtime:
+    endpoint: https://qt.gtimg.cn/q={{symbols}}
+    method: GET
+    batch_size: 50
+response:
+  encoding: gbk
+  format: json
+  kline:
+    data_path: data.{{symbol}}.qfq{{period}}||data.{{symbol}}.{{period}}
+    row_format: array
+    field_mapping:
+      timestamp:
+        index: 0
+        type: time
+        formats:
+        - '2006-01-02 15:04:05'
+        - 2006-01-02 15:04
+        - '2006-01-02'
+        - '20060102150405'
+        - '200601021504'
+        day_close_time: '15:00:00'
+      open_px:
+        index: 1
+        type: float
+      close_px:
+        index: 2
+        type: float
+      high_px:
+        index: 3
+        type: float
+      low_px:
+        index: 4
+        type: float
+      volume:
+        index: 5
+        type: int
+        transform: multiply:100
+      turnover_value:
+        index: 6
+        type: float
+        transform: multiply:10000
+  realtime:
+    data_path: $
+    row_format: text
+    text_parse:
+      line_separator: ;
+      prefix: v_
+      symbol_extract:
+        mode: prefix_to_equals
+        trim_prefix: true
+        to_lower: true
+      content_extract:
+        mode: quoted
+        quote_char: '"'
+      field_delimiter: '~'
+      time_fields:
+        update_time:
+          index: 30
+          formats:
+          - '20060102150405'
+          - '200601021504'
+    field_mapping:
+      prod_name:
+        index: 1
+        type: string
+      last_px:
+        index: 3
+        type: float
+      pre_close_px:
+        index: 4
+        type: float
+      open_px:
+        index: 5
+        type: float
+      volume:
+        index: 6
+        type: int
+        transform: multiply:100
+      px_change:
+        index: 31
+        type: float
+      px_change_rate:
+        index: 32
+        type: float
+      high_px:
+        index: 33
+        type: float
+      low_px:
+        index: 34
+        type: float
+      amount:
+        index: 37
+        type: float
+        transform: multiply:10000
+      turnover_ratio:
+        index: 38
+        type: float
+      pe_rate:
+        index: 39
+        type: float
+      circulation_value:
+        index: 44
+        type: float
+      market_value:
+        index: 45
+        type: float
+  batch_realtime:
+    data_path: $
+    row_format: text
+    text_parse:
+      line_separator: ;
+      prefix: v_
+      symbol_extract:
+        mode: prefix_to_equals
+        trim_prefix: true
+        to_lower: true
+      content_extract:
+        mode: quoted
+        quote_char: '"'
+      field_delimiter: '~'
+      time_fields:
+        update_time:
+          index: 30
+          formats:
+          - '20060102150405'
+          - '200601021504'
+    field_mapping:
+      prod_name:
+        index: 1
+        type: string
+      last_px:
+        index: 3
+        type: float
+      pre_close_px:
+        index: 4
+        type: float
+      open_px:
+        index: 5
+        type: float
+      volume:
+        index: 6
+        type: int
+        transform: multiply:100
+      px_change:
+        index: 31
+        type: float
+      px_change_rate:
+        index: 32
+        type: float
+      high_px:
+        index: 33
+        type: float
+      low_px:
+        index: 34
+        type: float
+      amount:
+        index: 37
+        type: float
+        transform: multiply:10000
+      turnover_ratio:
+        index: 38
+        type: float
+      pe_rate:
+        index: 39
+        type: float
+      circulation_value:
+        index: 44
+        type: float
+      market_value:
+        index: 45
+        type: float
+symbol:
+  output_template: '{{exchange}}{{code}}'
+period_mapping:
+  1d: day
+  1w: week
+  1M: month
+limits:
+  supported_periods:
+  - 1d
+  - 1w
+  - 1M
+metadata:
+  kline_endpoints:
+    minute: https://ifzq.gtimg.cn/appstock/app/kline/mkline
+    day_week_month: http://web.ifzq.gtimg.cn/appstock/app/fqkline/get
+  realtime_endpoint_template: http://qt.gtimg.cn/q={{symbols}}
+  disclaimer: '免责声明：本配置仅用于学习研究与个人使用示例，数据版权与接口使用权归原数据提供方所有。
+
+    请遵守对应站点/接口的服务条款与相关法律法规；严禁用于抓取牟利、转售或其他未经授权的商业用途。
+
+    '
+  maintainer: TradingBea
+  verification_status: realtime_batch_daily_verified
+  last_verified_at: "2026-09-09"
+  verification_scope: "000001.SZ realtime and daily; 000001.SZ,600000.SS batch; other periods unverified"
+  test_symbol: 000001.SZ

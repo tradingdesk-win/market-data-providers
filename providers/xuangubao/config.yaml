@@ -1,0 +1,216 @@
+id: xuangubao
+name: 选股宝
+description: 选股宝中国大陆股票行情配置（实时/批量实时/K线）
+version: 1.1.0
+enabled: false
+supported_markets:
+- CN
+supported_types:
+- STOCK
+api:
+  base_url: https://api-ddc-wscn.xuangubao.com.cn/market
+  timeout: 10s
+  max_retry: 3
+  retry_backoff: 1s
+  kline:
+    endpoint: /kline
+    method: GET
+    date_format: unix
+    params:
+      prod_code: '{{symbol}}'
+      period_type: '{{period}}'
+      tick_count: '{{limit|default:300}}'
+      adjust_price_type: forward
+      timestamp: '{{endDate|default:}}'
+      fields: open_px,close_px,high_px,low_px,turnover_volume,turnover_value,tick_at
+  realtime:
+    endpoint: /real
+    method: GET
+    params:
+      prod_code: '{{symbol}}'
+      fields: prod_name,trade_status,update_time,last_px,px_change,px_change_rate,preclose_px,open_px,high_px,low_px,amplitude,turnover_ratio,pe_rate,dyn_pe,dyn_pb_rate,market_value,circulation_value,turnover_volume,turnover_value,hq_type_code,securities_type,volume_ratio,circulation_shares,total_shares,bps
+  batch_realtime:
+    endpoint: /real
+    method: GET
+    batch_size: 100
+    params:
+      prod_code: '{{symbols}}'
+      fields: prod_name,trade_status,update_time,last_px,px_change,px_change_rate,preclose_px,open_px,high_px,low_px,amplitude,turnover_ratio,pe_rate,dyn_pe,dyn_pb_rate,market_value,circulation_value,turnover_volume,turnover_value,hq_type_code,securities_type,volume_ratio,circulation_shares,total_shares,bps
+response:
+  encoding: utf-8
+  format: json
+  kline:
+    data_path: data.candle.{{symbol}}.lines
+    row_format: array
+    field_mapping:
+      open_px:
+        index: 0
+        type: float
+      close_px:
+        index: 1
+        type: float
+      high_px:
+        index: 2
+        type: float
+      low_px:
+        index: 3
+        type: float
+      volume:
+        index: 4
+        type: int
+      turnover_value:
+        index: 5
+        type: float
+      timestamp:
+        index: 6
+        type: time
+  realtime:
+    data_path: data.quote
+    row_format: object
+    field_mapping:
+      prod_name:
+        source: prod_name
+        type: string
+      last_px:
+        source: last_px
+        type: float
+      px_change:
+        source: px_change
+        type: float
+      px_change_rate:
+        source: px_change_rate
+        type: float
+      pre_close_px:
+        source: preclose_px
+        type: float
+      open_px:
+        source: open_px
+        type: float
+      high_px:
+        source: high_px
+        type: float
+      low_px:
+        source: low_px
+        type: float
+      amplitude:
+        source: amplitude
+        type: float
+      turnover_ratio:
+        source: turnover_ratio
+        type: float
+      pe_rate:
+        source: pe_rate
+        type: float
+      market_value:
+        source: market_value
+        type: float
+      circulation_value:
+        source: circulation_value
+        type: float
+      volume:
+        source: turnover_volume
+        type: int
+      amount:
+        source: turnover_value
+        type: float
+      volume_ratio:
+        source: volume_ratio
+        type: float
+      update_time:
+        source: update_time
+        type: time
+    fields_expand:
+      fields_path: fields
+      values_path: snapshot
+  batch_realtime:
+    data_path: data.snapshot
+    row_format: object
+    fields_expand:
+      fields_path: fields
+      values_path: snapshot
+      batch_mode: true
+    parser: xuangubao_realtime
+    field_mapping:
+      prod_name:
+        source: prod_name
+        type: string
+      last_px:
+        source: last_px
+        type: float
+      px_change:
+        source: px_change
+        type: float
+      px_change_rate:
+        source: px_change_rate
+        type: float
+      pre_close_px:
+        source: preclose_px
+        type: float
+      open_px:
+        source: open_px
+        type: float
+      high_px:
+        source: high_px
+        type: float
+      low_px:
+        source: low_px
+        type: float
+      amplitude:
+        source: amplitude
+        type: float
+      turnover_ratio:
+        source: turnover_ratio
+        type: float
+      pe_rate:
+        source: pe_rate
+        type: float
+      market_value:
+        source: market_value
+        type: float
+      circulation_value:
+        source: circulation_value
+        type: float
+      volume:
+        source: turnover_volume
+        type: int
+      amount:
+        source: turnover_value
+        type: float
+      volume_ratio:
+        source: volume_ratio
+        type: float
+      update_time:
+        source: update_time
+        type: time
+symbol:
+  output_template: '{{code}}.{{EXCHANGE}}'
+  exchange_mapping:
+    sh: SS
+    sz: SZ
+period_mapping:
+  15m: '900'
+  1h: '3600'
+  2h: '7200'
+  1d: '86400'
+  1w: '604800'
+  1M: '2592000'
+limits:
+  supported_periods:
+  - 15m
+  - 1h
+  - 2h
+  - 1d
+  - 1w
+  - 1M
+metadata:
+  timestamp_transform: multiply:1000
+  disclaimer: '免责声明：本配置仅用于学习研究与个人使用示例，数据版权与接口使用权归原数据提供方所有。
+
+    请遵守对应站点/接口的服务条款与相关法律法规；严禁用于抓取牟利、转售或其他未经授权的商业用途。
+
+    '
+  maintainer: TradingBea
+  verification_status: realtime_batch_daily_verified
+  last_verified_at: "2026-09-09"
+  verification_scope: "000001.SZ realtime and daily; 000001.SZ,600000.SS batch; other periods unverified"
+  test_symbol: 000001.SZ

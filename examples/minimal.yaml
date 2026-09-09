@@ -1,0 +1,24 @@
+id: example-quotes
+name: 虚构行情接口示例
+version: "1.0"
+enabled: false
+supported_markets: [CN]
+supported_types: [STOCK]
+api:
+  base_url: https://example.invalid
+  timeout: 10s
+  realtime:
+    endpoint: /quote
+    method: GET
+    params:
+      symbol: "{{symbol}}"
+response:
+  format: json
+  realtime:
+    data_path: data
+    row_format: object
+    field_mapping:
+      price: {source: price, type: float}
+metadata:
+  maintainer: TradingBea
+  verification_status: unverified
