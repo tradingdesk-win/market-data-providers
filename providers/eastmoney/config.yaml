@@ -4,7 +4,7 @@ description: 东方财富中国大陆股票行情配置（实时/批量实时/K�
 version: 1.1.0
 enabled: false
 api:
-  base_url: https://push2.eastmoney.com
+  base_url: http://push2.eastmoney.com
   timeout: 10s
   max_retry: 3
   retry_backoff: 1s
@@ -17,7 +17,7 @@ api:
     Connection: close
     Origin: https://quote.eastmoney.com
   kline:
-    endpoint: https://push2his.eastmoney.com/api/qt/stock/kline/get
+    endpoint: http://push2his.eastmoney.com/api/qt/stock/kline/get
     method: GET
     date_format: '20060102'
     params:
@@ -30,7 +30,7 @@ api:
       lmt: '{{limit|default:1000}}'
       secid: '{{symbol}}'
   realtime:
-    endpoint: https://push2.eastmoney.com/api/qt/stock/get
+    endpoint: http://push2.eastmoney.com/api/qt/stock/get
     method: GET
     params:
       fields: f43,f44,f45,f46,f47,f48,f57,f58,f60,f169,f170
@@ -38,7 +38,7 @@ api:
       invt: '2'
       secid: '{{symbol}}'
   batch_realtime:
-    endpoint: https://push2.eastmoney.com/api/qt/ulist/get
+    endpoint: http://push2.eastmoney.com/api/qt/ulist/get
     method: GET
     params:
       fields: f12,f14,f2,f3,f4,f5,f6,f15,f16,f17,f18
