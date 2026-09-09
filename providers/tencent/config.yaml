@@ -8,7 +8,7 @@ supported_markets:
 supported_types:
 - STOCK
 api:
-  base_url: https://web.ifzq.gtimg.cn
+  base_url: http://web.ifzq.gtimg.cn
   timeout: 10s
   max_retry: 3
   retry_backoff: 1s
@@ -17,16 +17,16 @@ api:
     User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
       like Gecko) Chrome/120.0.0.0 Safari/537.36
   kline:
-    endpoint: https://web.ifzq.gtimg.cn/appstock/app/fqkline/get
+    endpoint: http://web.ifzq.gtimg.cn/appstock/app/fqkline/get
     method: GET
     date_format: '2006-01-02'
     params:
       param: '{{symbol}},{{period}},{{startDate|default:}},{{endDate|default:}},{{limit|default:320}},qfq'
   realtime:
-    endpoint: https://qt.gtimg.cn/q={{symbol}}
+    endpoint: http://qt.gtimg.cn/q={{symbol}}
     method: GET
   batch_realtime:
-    endpoint: https://qt.gtimg.cn/q={{symbols}}
+    endpoint: http://qt.gtimg.cn/q={{symbols}}
     method: GET
     batch_size: 50
 response:

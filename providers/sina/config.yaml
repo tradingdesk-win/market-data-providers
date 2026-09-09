@@ -8,7 +8,7 @@ supported_markets:
 supported_types:
 - STOCK
 api:
-  base_url: https://quotes.sina.cn
+  base_url: http://quotes.sina.cn
   timeout: 10s
   max_retry: 3
   retry_backoff: 1s
@@ -17,7 +17,7 @@ api:
     User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
       like Gecko) Chrome/120.0.0.0 Safari/537.36
   kline:
-    endpoint: https://quotes.sina.cn/cn/api/json_v2.php/CN_MarketDataService.getKLineData
+    endpoint: http://quotes.sina.cn/cn/api/json_v2.php/CN_MarketDataService.getKLineData
     method: GET
     date_format: '2006-01-02'
     params:
@@ -26,10 +26,10 @@ api:
       ma: 'no'
       datalen: '1023'
   realtime:
-    endpoint: https://hq.sinajs.cn/list={{symbol}}
+    endpoint: http://hq.sinajs.cn/list={{symbol}}
     method: GET
   batch_realtime:
-    endpoint: https://hq.sinajs.cn/list={{symbols}}
+    endpoint: http://hq.sinajs.cn/list={{symbols}}
     method: GET
     batch_size: 50
 response:
