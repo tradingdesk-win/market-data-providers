@@ -49,3 +49,7 @@ Schema 校验发布格式；TradingDesk 导入器仍会执行自己的 Go 模型
 将本仓库原有 GitHub main 历史完整导入 Gitea（不要另建不相关历史）。启用 Actions，为 `ubuntu-latest` 标签配置可执行 checkout/setup-python 的隔离 Runner，并设置仓库 Secret `MARKET_PROVIDERS_GITHUB_TOKEN`。Token 仅授权此 GitHub 仓库，需 Contents 写权限；首次推送 workflow 文件还需 Workflows 写权限。
 
 `.gitea/workflows/validate-and-mirror.yml` 先校验，再仅在 main push 时普通推送到 GitHub main；PR 作业不读取镜像令牌。不部署到 Runner 工作目录长期运行，不使用强制镜像，不推送删除或所有 refs。Gitea URL、Runner 和 Secret 需管理员配置，本地文件不代表远端部署完成。
+
+### Tushare Token
+
+启用 `providers/tushare/config.yaml` 前，将 Tushare Pro Token 注入运行环境变量 `TUSHARE_TOKEN`。配置中的占位符会在运行时解析；不要把真实 Token 提交到 YAML、日志或版本库。Token 为空时 Provider 必须保持禁用并提示配置错误。
