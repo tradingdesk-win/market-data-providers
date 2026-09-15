@@ -3,14 +3,6 @@ name: Tushare
 description: Tushare Pro 日线行情（运行时注入 API Token）
 version: 1.0.0
 enabled: false
-auth:
-  type: api_key
-  fields:
-    - name: token
-      label: Tushare API Token
-      secret: true
-      required: true
-      env: TUSHARE_TOKEN
 api:
   base_url: https://api.tushare.pro
   timeout: 10s

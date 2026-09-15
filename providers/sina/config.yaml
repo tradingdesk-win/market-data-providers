@@ -159,7 +159,7 @@ limits:
   - 1h
   - 2h
   - 1d
-  unsupported_message: 新浪数据源不支持周K/月K，请切换到选股宝或使用日K数据
+  unsupported_message: 新浪数据源不支持周K/月K，请切换到其他支持周K/月K的数据源或使用日K数据
 metadata:
   disclaimer: '免责声明：本配置仅用于学习研究与个人使用示例，数据版权与接口使用权归原数据提供方所有。
 
