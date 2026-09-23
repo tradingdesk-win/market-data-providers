@@ -169,7 +169,10 @@ metadata:
 
     '
   maintainer: TradingBea
-  verification_status: realtime_batch_daily_verified
-  last_verified_at: "2026-09-09"
-  verification_scope: "000001.SZ realtime and daily; 000001.SZ,600000.SS batch; other periods unverified"
+  verification_status: realtime_batch_daily_verified_cn_only
+  last_verified_at: "2026-09-24"
+  verification_scope: "CN 000001.SZ realtime and daily; CN 000001.SZ,600000.SS batch. Raw endpoint probes on 2026-09-24 returned HK hk00700 and US gb_aapl realtime payloads, but their field layouts are incompatible with this CN parser; the configured CN K-line endpoint returned null for hk00700 and gb_aapl. HK/US remain unsupported by this configuration."
   test_symbol: 000001.SZ
+  unsupported_market_probes:
+    HK: hk00700
+    US: gb_aapl

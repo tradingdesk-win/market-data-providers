@@ -36,6 +36,12 @@ class ValidationTests(unittest.TestCase):
                 self.assertEqual(document["metadata"]["test_symbol"], symbol)
                 validate_document(document)
 
+    def test_sina_keeps_hk_us_out_of_supported_markets_after_probe(self):
+        document = yaml.load((ROOT / "providers/sina/config.yaml").read_text(), Loader=UniqueLoader)
+        self.assertEqual(document["supported_markets"], ["CN"])
+        self.assertEqual(document["metadata"]["unsupported_market_probes"], {"HK": "hk00700", "US": "gb_aapl"})
+        validate_document(document)
+
     def test_reject_invalid_documents(self):
         for key, value in (("id", "../escape"), ("enabled", True), ("supported_markets", ["UNKNOWN"])):
             with self.subTest(key=key), self.assertRaises(Exception):
