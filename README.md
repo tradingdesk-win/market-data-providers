@@ -13,6 +13,8 @@ Download the **Raw** YAML file. In TradingDesk, open **Global Settings → Data 
 | 数据源 / Provider | 文件 / File | 市场 / 品种 | K 线周期 / Periods |
 | --- | --- | --- | --- |
 | 新浪财经 / Sina Finance | `providers/sina/config.yaml` | CN / STOCK | 15m、30m、1h、2h、1d |
+| 新浪财经港股 / Sina HK | `providers/sina-hk/config.yaml` | HK / STOCK | 实时、批量实时；无 K 线 |
+| 新浪财经美股 / Sina US | `providers/sina-us/config.yaml` | US / STOCK | 实时、批量实时；无 K 线 |
 | 腾讯财经 / Tencent Finance | `providers/tencent/config.yaml` | CN、HK、US / STOCK | 1d、1w、1M (HK/US live-checked for 1d only) |
 | Tushare | `providers/tushare/config.yaml` | CN / STOCK | 1d |
 | Tushare Pro 港股 | `providers/tushare-hk/config.yaml` | HK / STOCK | 1d |

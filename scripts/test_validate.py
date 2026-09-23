@@ -42,6 +42,17 @@ class ValidationTests(unittest.TestCase):
         self.assertEqual(document["metadata"]["unsupported_market_probes"], {"HK": "hk00700", "US": "gb_aapl"})
         validate_document(document)
 
+    def test_sina_cross_market_configs_are_realtime_only(self):
+        for provider, market, symbol, prefix in (("sina-hk", "HK", "00700.HK", "rt_hk"), ("sina-us", "US", "AAPL.US", "gb_")):
+            with self.subTest(provider=provider):
+                document = yaml.load((ROOT / f"providers/{provider}/config.yaml").read_text(), Loader=UniqueLoader)
+                self.assertEqual(document["supported_markets"], [market])
+                self.assertFalse(document["enabled"])
+                self.assertEqual(document["limits"]["supported_periods"], [])
+                self.assertEqual(document["metadata"]["test_symbol"], symbol)
+                self.assertTrue(document["symbol"]["output_template"].startswith(prefix))
+                validate_document(document)
+
     def test_reject_invalid_documents(self):
         for key, value in (("id", "../escape"), ("enabled", True), ("supported_markets", ["UNKNOWN"])):
             with self.subTest(key=key), self.assertRaises(Exception):
