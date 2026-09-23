@@ -2,6 +2,10 @@
 __pycache__/
 *.pyc
 .env
+providers/baidu/
+providers/hexin/
+providers/netease/
+providers/sohu/
 # 已停用的数据源不得重新加入仓库
 providers/xuangubao/
 **/*xuangubao*

@@ -1,0 +1,101 @@
+id: hithink
+name: 同花顺 iFinD
+description: 同花顺 Financial-API A 股日线行情与实时快照（运行时注入 API Key）
+version: 1.0.0
+enabled: false
+supported_markets: [CN]
+supported_types: [STOCK]
+api:
+  base_url: https://fuyao.aicubes.cn
+  timeout: 10s
+  max_retry: 3
+  retry_backoff: 1s
+  headers:
+    X-api-key: '${HITHINK_FINANCE_API_KEY}'
+  kline:
+    endpoint: /api/a-share/prices/historical
+    method: GET
+    date_format: unix_ms
+    params:
+      thscode: '{{symbol}}'
+      interval: '{{period}}'
+      start: '{{startTimestamp}}'
+      end: '{{endTimestamp}}'
+      adjust: forward
+  realtime:
+    endpoint: /api/a-share/prices/snapshot
+    method: GET
+    params:
+      thscodes: '{{symbol}}'
+  batch_realtime:
+    endpoint: /api/a-share/prices/snapshot
+    method: GET
+    batch_size: 100
+    params:
+      thscodes: '{{symbols}}'
+response:
+  encoding: utf-8
+  format: json
+  kline:
+    data_path: data.item
+    row_format: object
+    field_mapping:
+      timestamp: {source: date_ms, type: time}
+      open_px: {source: open_price, type: float}
+      high_px: {source: high_price, type: float}
+      low_px: {source: low_price, type: float}
+      close_px: {source: close_price, type: float}
+      volume: {source: volume, type: int}
+      turnover_value: {source: turnover, type: float}
+  realtime:
+    data_path: data.item[0]
+    row_format: object
+    field_mapping:
+      symbol: {source: thscode, type: string}
+      last_px: {source: last_price, type: float}
+      px_change: {source: price_change, type: float}
+      px_change_rate: {source: price_change_ratio_pct, type: float}
+      pre_close_px: {source: prev_price, type: float}
+      open_px: {source: open_price, type: float}
+      high_px: {source: high_price, type: float}
+      low_px: {source: low_price, type: float}
+      volume: {source: volume, type: int}
+      amount: {source: turnover, type: float}
+  batch_realtime:
+    data_path: data.item
+    row_format: object
+    field_mapping:
+      symbol: {source: thscode, type: string}
+      last_px: {source: last_price, type: float}
+      px_change: {source: price_change, type: float}
+      px_change_rate: {source: price_change_ratio_pct, type: float}
+      pre_close_px: {source: prev_price, type: float}
+      open_px: {source: open_price, type: float}
+      high_px: {source: high_price, type: float}
+      low_px: {source: low_price, type: float}
+      volume: {source: volume, type: int}
+      amount: {source: turnover, type: float}
+symbol:
+  output_template: '{{code}}.{{EXCHANGE}}'
+  exchange_mapping:
+    sh: SH
+    sz: SZ
+period_mapping: {1d: 1d}
+limits:
+  supported_periods: [1d]
+metadata:
+  api_key_validation: 启用或测试前必须提供非空 HITHINK_FINANCE_API_KEY；禁止将 API Key 写入配置文件
+  api_key_env: HITHINK_FINANCE_API_KEY
+  rate_limit: 依同花顺 Financial-API 账号权限与限流策略
+  source_type: imported
+  token_required: true
+  verification_status: unverified
+  test_symbol: 000001.SZ
+auth:
+  type: api_key
+  fields:
+    - name: api_key
+      label: 同花顺 Financial-API Key
+      secret: true
+      required: true
+      env: HITHINK_FINANCE_API_KEY

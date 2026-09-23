@@ -12,6 +12,7 @@
     "enabled": {"const": false},
     "supported_markets": {"type": "array", "uniqueItems": true, "items": {"enum": ["CN", "US", "HK", "CRYPTO"]}},
     "supported_types": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "auth": {"$ref": "#/$defs/auth"},
     "metadata": {"type": "object"},
     "period_mapping": {"type": "object", "additionalProperties": {"type": "string"}},
     "symbol": {"type": "object"},
@@ -53,7 +54,8 @@
         "method": {"enum": ["GET", "POST"]},
         "date_format": {"type": "string"},
         "params": {"type": "object", "additionalProperties": {"type": "string"}},
-        "batch_size": {"type": "integer", "minimum": 1}
+        "batch_size": {"type": "integer", "minimum": 1},
+        "batch_symbol_encoding": {"enum": ["csv", "json_array"]}
       }
     },
     "parser": {
@@ -62,6 +64,28 @@
         "data_path": {"type": "string"},
         "row_format": {"enum": ["object", "array", "csv", "csv_string", "text"]},
         "field_mapping": {"type": "object"}
+      }
+    },
+    "auth": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {"type": "string"},
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name"],
+            "additionalProperties": false,
+            "properties": {
+              "name": {"type": "string", "minLength": 1},
+              "label": {"type": "string"},
+              "secret": {"type": "boolean"},
+              "required": {"type": "boolean"},
+              "env": {"type": "string"}
+            }
+          }
+        }
       }
     }
   }

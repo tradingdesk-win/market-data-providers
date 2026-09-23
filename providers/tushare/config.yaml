@@ -37,7 +37,10 @@ response:
       turnover_value: {index: 7, type: float, transform: multiply:1000}
       turnover_ratio: {index: 8, type: float}
 symbol:
-  passthrough: true
+  output_template: '{{code}}.{{EXCHANGE}}'
+  exchange_mapping:
+    sh: SH
+    sz: SZ
 period_mapping: {1d: day}
 limits:
   supports_turnover: true
@@ -47,5 +50,13 @@ metadata:
   token_required: true
   rate_limit: '依 Tushare Pro 账号积分与接口限流策略'
   api_key_validation: '启动或启用前必须提供非空 TUSHARE_TOKEN；禁止将 token 写入配置文件'
+auth:
+  type: api_key
+  fields:
+    - name: token
+      label: Tushare API Token
+      secret: true
+      required: true
+      env: TUSHARE_TOKEN
 supported_markets: [CN]
 supported_types: [STOCK]

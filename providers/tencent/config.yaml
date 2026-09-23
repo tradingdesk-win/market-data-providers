@@ -1,10 +1,12 @@
 id: tencent
 name: 腾讯财经
-description: 腾讯财经中国大陆股票行情配置（实时/批量实时/K线）
-version: 1.1.0
+description: 腾讯财经 CN/HK/US 股票行情配置（实时/批量实时/日线）
+version: 1.2.0
 enabled: false
 supported_markets:
 - CN
+- HK
+- US
 supported_types:
 - STOCK
 api:
@@ -198,6 +200,14 @@ response:
         type: float
 symbol:
   output_template: '{{exchange}}{{code}}'
+  exchange_mapping:
+    sh: sh
+    ss: sh
+    sz: sz
+    hk: hk
+    us: us
+    nasdaq: us
+    nyse: us
 period_mapping:
   1d: day
   1w: week
@@ -219,6 +229,13 @@ metadata:
     '
   maintainer: TradingBea
   verification_status: realtime_batch_daily_verified
-  last_verified_at: "2026-09-09"
-  verification_scope: "000001.SZ realtime and daily; 000001.SZ,600000.SS batch; other periods unverified"
+  last_verified_at: "2026-09-24"
+  verification_scope: "Live endpoint checks on 2026-09-24: CN 000001.SZ quote and daily K-line; HK 00700.HK quote and daily K-line; US AAPL.US quote and daily K-line; HK 00700.HK plus US AAPL.US batch quote. Weekly/monthly responses use the same endpoint but were not live-checked for HK/US. Requires application symbol normalization for .HK/.US suffixes."
   test_symbol: 000001.SZ
+  market_symbol_examples:
+    HK: 00700.HK
+    US: AAPL.US
+  market_symbol_formats:
+    HK: hk{{code}}
+    US: us{{code}}
+  limitations: "Observed public endpoints only; no availability, authorization, redistribution, or market-data licensing guarantee. US symbol coverage and exchange suffix behavior may vary by instrument."

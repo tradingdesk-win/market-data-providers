@@ -1,0 +1,52 @@
+id: binance
+name: Binance Spot
+description: Binance Spot public ticker prices; crypto pairs only, with quote-currency denomination preserved.
+version: 1.0.0
+enabled: false
+supported_markets: [CRYPTO]
+supported_types: [CRYPTO]
+api:
+  base_url: https://api.binance.com
+  timeout: 10s
+  max_retry: 2
+  retry_backoff: 1s
+  realtime:
+    endpoint: /api/v3/ticker/price
+    method: GET
+    params:
+      symbol: '{{symbol}}'
+  batch_realtime:
+    endpoint: /api/v3/ticker/24hr
+    method: GET
+    batch_size: 100
+    batch_symbol_encoding: json_array
+    params:
+      symbols: '{{symbols}}'
+response:
+  encoding: utf-8
+  format: json
+  realtime:
+    data_path: $
+    row_format: object
+    field_mapping:
+      symbol: {source: symbol, type: string}
+      last_px: {source: price, type: float}
+  batch_realtime:
+    data_path: $
+    row_format: array
+    field_mapping:
+      symbol: {source: symbol, type: string}
+      last_px: {source: lastPrice, type: float}
+symbol:
+  passthrough: false
+  crypto_pair_format: compact
+  output_template: '{{code}}'
+period_mapping: {}
+metadata:
+  product_scope: Spot only; no futures, margin, account, order, or trading endpoints.
+  quote_currency: Returned price is denominated in the pair quote asset; USDT is not converted to USD.
+  batch_limit: 100 symbols per request, enforced by batch_size.
+  rate_limit: Public market-data API limits apply; no high-frequency polling guarantee.
+  documentation: https://developers.binance.com/en/docs/catalog/core-trading-spot-trading/api/rest-api/market
+  verification_status: endpoint_schema_verified_fixture_only
+  verification_scope: Endpoint and response mappings checked against sanitized documented ticker response shapes; no live request performed.

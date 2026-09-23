@@ -39,7 +39,10 @@ def validate_document(document):
         if not parser.get("field_mapping") and not parser.get("parser"):
             raise ValueError(f"missing response parser: {endpoint}")
     for key, value in document["api"].get("headers", {}).items():
-        if re.search(r"authorization|cookie|api[-_]?key|token|secret", key, re.I) and value:
+        # Runtime environment placeholders are safe to publish; reject only
+        # literal credential material in sensitive headers.
+        is_runtime_placeholder = bool(re.fullmatch(r"\$\{[A-Za-z_][A-Za-z0-9_]*\}", value.strip()))
+        if re.search(r"authorization|cookie|api[-_]?key|token|secret", key, re.I) and value and not is_runtime_placeholder:
             raise ValueError(f"do not publish credentials in header {key}")
     text = yaml.safe_dump(document)
     if re.search(r"gh[pousr]_[A-Za-z0-9]{20,}|github_pat_|-----BEGIN .*PRIVATE KEY-----", text):

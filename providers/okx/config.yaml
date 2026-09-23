@@ -1,0 +1,50 @@
+id: okx
+name: OKX Spot
+description: OKX public Spot ticker prices; crypto pairs only, with quote-currency denomination preserved.
+version: 1.0.0
+enabled: false
+supported_markets: [CRYPTO]
+supported_types: [CRYPTO]
+api:
+  base_url: https://www.okx.com
+  timeout: 10s
+  max_retry: 2
+  retry_backoff: 1s
+  realtime:
+    endpoint: /api/v5/market/ticker
+    method: GET
+    params:
+      instId: '{{symbol}}'
+  batch_realtime:
+    endpoint: /api/v5/market/tickers
+    method: GET
+    batch_size: 100
+    params:
+      instType: SPOT
+response:
+  encoding: utf-8
+  format: json
+  realtime:
+    data_path: data[0]
+    row_format: object
+    field_mapping:
+      symbol: {source: instId, type: string}
+      last_px: {source: last, type: float}
+  batch_realtime:
+    data_path: data
+    row_format: object
+    field_mapping:
+      symbol: {source: instId, type: string}
+      last_px: {source: last, type: float}
+symbol:
+  passthrough: false
+  crypto_pair_format: hyphen
+  output_template: '{{code}}'
+period_mapping: {}
+metadata:
+  product_scope: SPOT only; no derivatives, account, order, or trading endpoints.
+  quote_currency: Returned price is denominated in the pair quote asset; USDT is not converted to USD.
+  rate_limit: Public market-data API limits apply; no high-frequency polling guarantee.
+  documentation: https://app.okx.com/docs-v5/en/#overview
+  verification_status: endpoint_schema_verified_fixture_only
+  verification_scope: Endpoint and response mappings checked against sanitized documented ticker response shapes; no live request performed.
