@@ -22,6 +22,20 @@ class ValidationTests(unittest.TestCase):
         self.assertIn("AAPL.US", document["metadata"]["verification_scope"])
         validate_document(document)
 
+    def test_tushare_cross_market_configs_use_dedicated_endpoints(self):
+        cases = {
+            "tushare-hk": ("HK", "hk_daily", "00001.HK"),
+            "tushare-us": ("US", "us_daily", "AAPL"),
+        }
+        for provider, (market, api_name, symbol) in cases.items():
+            with self.subTest(provider=provider):
+                document = yaml.load((ROOT / f"providers/{provider}/config.yaml").read_text(), Loader=UniqueLoader)
+                self.assertEqual(document["supported_markets"], [market])
+                self.assertFalse(document["enabled"])
+                self.assertEqual(document["api"]["kline"]["params"]["api_name"], api_name)
+                self.assertEqual(document["metadata"]["test_symbol"], symbol)
+                validate_document(document)
+
     def test_reject_invalid_documents(self):
         for key, value in (("id", "../escape"), ("enabled", True), ("supported_markets", ["UNKNOWN"])):
             with self.subTest(key=key), self.assertRaises(Exception):

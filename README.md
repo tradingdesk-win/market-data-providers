@@ -15,6 +15,8 @@ Download the **Raw** YAML file. In TradingDesk, open **Global Settings → Data 
 | 新浪财经 / Sina Finance | `providers/sina/config.yaml` | CN / STOCK | 15m、30m、1h、2h、1d |
 | 腾讯财经 / Tencent Finance | `providers/tencent/config.yaml` | CN、HK、US / STOCK | 1d、1w、1M (HK/US live-checked for 1d only) |
 | Tushare | `providers/tushare/config.yaml` | CN / STOCK | 1d |
+| Tushare Pro 港股 | `providers/tushare-hk/config.yaml` | HK / STOCK | 1d |
+| Tushare Pro 美股 | `providers/tushare-us/config.yaml` | US / STOCK | 1d |
 | 同花顺 iFinD / HiThink | `providers/hithink/config.yaml` | CN / STOCK | 1d |
 | Binance Spot | `providers/binance/config.yaml` | CRYPTO / CRYPTO (Spot) | 实时 / 批量实时 |
 | OKX Spot | `providers/okx/config.yaml` | CRYPTO / CRYPTO (Spot) | 实时 / 批量实时 |
