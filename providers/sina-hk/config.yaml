@@ -1,7 +1,7 @@
 id: sina-hk
 name: 新浪财经港股实时
 description: 新浪财经港股实时与批量实时行情（不提供历史 K 线）
-version: 1.0.0
+version: 1.0.1
 enabled: false
 supported_markets: [HK]
 supported_types: [STOCK]
@@ -32,22 +32,15 @@ response:
       symbol_extract: {mode: prefix_to_equals, trim_prefix: true, to_lower: true}
       content_extract: {mode: quoted, quote_char: '"'}
       field_delimiter: ','
-      field_mapping:
-        prod_name: {index: 0, type: string}
-        last_px: {index: 2, type: float}
-        pre_close_px: {index: 3, type: float}
-        open_px: {index: 4, type: float}
-        high_px: {index: 5, type: float}
-        low_px: {index: 6, type: float}
-      time_fields: {update_time: {date_index: 18, time_index: 19, formats: ['2006/01/02 15:04']}}
+      time_fields: {update_time: {date_index: 17, time_index: 18, formats: ['2006/01/02 15:04:05']}}
     parser: sina_realtime
     field_mapping:
-      prod_name: {index: 0, type: string}
-      last_px: {index: 2, type: float}
+      prod_name: {index: 1, type: string}
+      last_px: {index: 6, type: float}
       pre_close_px: {index: 3, type: float}
-      open_px: {index: 4, type: float}
-      high_px: {index: 5, type: float}
-      low_px: {index: 6, type: float}
+      open_px: {index: 2, type: float}
+      high_px: {index: 4, type: float}
+      low_px: {index: 5, type: float}
   batch_realtime:
     data_path: $
     row_format: text
@@ -57,22 +50,15 @@ response:
       symbol_extract: {mode: prefix_to_equals, trim_prefix: true, to_lower: true}
       content_extract: {mode: quoted, quote_char: '"'}
       field_delimiter: ','
-      field_mapping:
-        prod_name: {index: 0, type: string}
-        last_px: {index: 2, type: float}
-        pre_close_px: {index: 3, type: float}
-        open_px: {index: 4, type: float}
-        high_px: {index: 5, type: float}
-        low_px: {index: 6, type: float}
-      time_fields: {update_time: {date_index: 18, time_index: 19, formats: ['2006/01/02 15:04']}}
+      time_fields: {update_time: {date_index: 17, time_index: 18, formats: ['2006/01/02 15:04:05']}}
     parser: sina_realtime
     field_mapping:
-      prod_name: {index: 0, type: string}
-      last_px: {index: 2, type: float}
+      prod_name: {index: 1, type: string}
+      last_px: {index: 6, type: float}
       pre_close_px: {index: 3, type: float}
-      open_px: {index: 4, type: float}
-      high_px: {index: 5, type: float}
-      low_px: {index: 6, type: float}
+      open_px: {index: 2, type: float}
+      high_px: {index: 4, type: float}
+      low_px: {index: 5, type: float}
 symbol:
   output_template: 'rt_hk{{code}}'
 period_mapping: {}
@@ -81,7 +67,7 @@ limits:
   unsupported_message: 新浪港股配置仅支持实时和批量实时行情，历史 K 线暂未验证
 metadata:
   verification_status: realtime_batch_verified_fixture_and_live
-  last_verified_at: "2026-09-24"
-  verification_scope: "Live single and batch probe for hk00700; historical K-line endpoint unavailable."
+  last_verified_at: "2026-10-19"
+  verification_scope: "Live single and batch quotes checked on 2026-10-19 for 00700.HK and 00005.HK via rt_hk00700 and rt_hk00005. GBK decoding, Chinese name, price fields and second-resolution update time also covered by fixtures. No historical K-line capability."
   test_symbol: 00700.HK
   limitations: "No historical K-line capability; public endpoint availability and redistribution rights are not guaranteed."

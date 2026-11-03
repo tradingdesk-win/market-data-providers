@@ -44,6 +44,24 @@ def validate_document(document):
         is_runtime_placeholder = bool(re.fullmatch(r"\$\{[A-Za-z_][A-Za-z0-9_]*\}", value.strip()))
         if re.search(r"authorization|cookie|api[-_]?key|token|secret", key, re.I) and value and not is_runtime_placeholder:
             raise ValueError(f"do not publish credentials in header {key}")
+    stream = document['api'].get('kline_stream')
+    parser = document['response'].get('kline_stream')
+    if bool(stream) != bool(parser):
+        raise ValueError('stream endpoint and parser must be configured together')
+    if stream:
+        if 'kline' not in document['api']:
+            raise ValueError('stream requires REST history')
+        address = stream['url']
+        for token in ('symbol', 'symbol_lower', 'period'):
+            address = address.replace('{{' + token + '}}', 'sample')
+        parsed = urlparse(address)
+        if parsed.scheme != 'wss' or not parsed.hostname or parsed.username or parsed.password or parsed.fragment or '{{' in address:
+            raise ValueError('invalid public WSS URL')
+        for key in ('timestamp', 'open_px', 'high_px', 'low_px', 'close_px', 'volume'):
+            field = parser['field_mapping'][key]
+            expected = 'time' if key == 'timestamp' else 'int' if key == 'volume' else 'float'
+            if not field.get('source') or field.get('type') != expected or 'default' in field or field.get('transform'):
+                raise ValueError('invalid stream field mapping: ' + key)
     text = yaml.safe_dump(document)
     if re.search(r"gh[pousr]_[A-Za-z0-9]{20,}|github_pat_|-----BEGIN .*PRIVATE KEY-----", text):
         raise ValueError("potential secret detected")

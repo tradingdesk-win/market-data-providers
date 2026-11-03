@@ -1,7 +1,7 @@
 id: sina-us
 name: 新浪财经美股实时
 description: 新浪财经美股实时与批量实时行情（不提供历史 K 线）
-version: 1.0.0
+version: 1.0.1
 enabled: false
 supported_markets: [US]
 supported_types: [STOCK]
@@ -32,12 +32,6 @@ response:
       symbol_extract: {mode: prefix_to_equals, trim_prefix: true, to_lower: true}
       content_extract: {mode: quoted, quote_char: '"'}
       field_delimiter: ','
-      field_mapping:
-        prod_name: {index: 0, type: string}
-        last_px: {index: 1, type: float}
-        open_px: {index: 5, type: float}
-        high_px: {index: 6, type: float}
-        low_px: {index: 7, type: float}
       time_fields: {update_time: {index: 3, formats: ['2006-01-02 15:04:05']}}
     parser: sina_realtime
     field_mapping:
@@ -55,12 +49,6 @@ response:
       symbol_extract: {mode: prefix_to_equals, trim_prefix: true, to_lower: true}
       content_extract: {mode: quoted, quote_char: '"'}
       field_delimiter: ','
-      field_mapping:
-        prod_name: {index: 0, type: string}
-        last_px: {index: 1, type: float}
-        open_px: {index: 5, type: float}
-        high_px: {index: 6, type: float}
-        low_px: {index: 7, type: float}
       time_fields: {update_time: {index: 3, formats: ['2006-01-02 15:04:05']}}
     parser: sina_realtime
     field_mapping:
@@ -70,14 +58,15 @@ response:
       high_px: {index: 6, type: float}
       low_px: {index: 7, type: float}
 symbol:
-  output_template: 'gb_{{code}}'
+  output_template: 'gb_{{code_lower}}'
 period_mapping: {}
 limits:
   supported_periods: []
   unsupported_message: 新浪美股配置仅支持实时和批量实时行情，历史 K 线暂未验证
 metadata:
   verification_status: realtime_batch_verified_fixture_and_live
-  last_verified_at: "2026-09-24"
-  verification_scope: "Live single and batch probe for gb_aapl; historical K-line endpoint unavailable."
+  last_verified_at: "2026-10-19"
+  verification_scope: "Live single and batch quotes checked on 2026-10-19 for AAPL.US and MSFT.US via lowercase gb_aapl and gb_msft. GBK decoding, original batch symbol identity and update time also covered by fixtures. No historical K-line capability."
   test_symbol: AAPL.US
   limitations: "No historical K-line capability; public endpoint availability and redistribution rights are not guaranteed."
+  compatibility: "Requires a desktop build supporting the {{code_lower}} symbol template; use AAPL.US or MSFT.US as input."

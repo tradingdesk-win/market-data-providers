@@ -1,7 +1,7 @@
 id: binance
 name: Binance Spot
-description: Binance Spot public ticker prices; crypto pairs only, with quote-currency denomination preserved.
-version: 1.0.0
+description: Binance Spot public candlesticks and ticker prices; crypto pairs only, with quote-currency denomination preserved.
+version: 1.2.0
 enabled: false
 supported_markets: [CRYPTO]
 supported_types: [CRYPTO]
@@ -10,6 +10,19 @@ api:
   timeout: 10s
   max_retry: 2
   retry_backoff: 1s
+  kline:
+    endpoint: /api/v3/klines
+    method: GET
+    date_format: unix_ms
+    price_basis: RAW
+    params:
+      symbol: '{{symbol}}'
+      interval: '{{period}}'
+      # Fetch the latest page before the cursor; the provider filters the start bound locally.
+      endTime: '{{endDate}}'
+      limit: '{{limit|default:500}}'
+  kline_stream:
+    url: 'wss://stream.binance.com:9443/ws/{{symbol_lower}}@kline_{{period}}'
   realtime:
     endpoint: /api/v3/ticker/price
     method: GET
@@ -25,6 +38,31 @@ api:
 response:
   encoding: utf-8
   format: json
+  kline:
+    data_path: $
+    row_format: array
+    field_mapping:
+      timestamp: {index: 0, type: time}
+      open_px: {index: 1, type: float}
+      high_px: {index: 2, type: float}
+      low_px: {index: 3, type: float}
+      close_px: {index: 4, type: float}
+      volume: {index: 5, type: int}
+      turnover_value: {index: 7, type: float}
+  kline_stream:
+    data_path: $.k
+    row_format: object
+    symbol_field: s
+    period_field: i
+    closed_field: x
+    field_mapping:
+      timestamp: {source: t, type: time}
+      open_px: {source: o, type: float}
+      high_px: {source: h, type: float}
+      low_px: {source: l, type: float}
+      close_px: {source: c, type: float}
+      volume: {source: v, type: int}
+      turnover_value: {source: q, type: float}
   realtime:
     data_path: $
     row_format: object
@@ -41,12 +79,28 @@ symbol:
   passthrough: false
   crypto_pair_format: compact
   output_template: '{{code}}'
-period_mapping: {}
+period_mapping:
+  1m: 1m
+  5m: 5m
+  15m: 15m
+  30m: 30m
+  1h: 1h
+  2h: 2h
+  4h: 4h
+  1d: 1d
+  1w: 1w
+  1M: 1M
+limits:
+  max_data_points: 500
+  supported_periods: [1m, 5m, 15m, 30m, 1h, 2h, 4h, 1d, 1w, 1M]
 metadata:
+  test_symbol: BTC-USDT
+  test_symbols: [BTC-USDT, ETH-USDT]
+  kline_pagination: Uses endTime in milliseconds for backwards pagination, omitting startTime to retrieve the latest page before the cursor. Candle timestamps are UTC open times.
   product_scope: Spot only; no futures, margin, account, order, or trading endpoints.
   quote_currency: Returned price is denominated in the pair quote asset; USDT is not converted to USD.
   batch_limit: 100 symbols per request, enforced by batch_size.
   rate_limit: Public market-data API limits apply; no high-frequency polling guarantee.
-  documentation: https://developers.binance.com/en/docs/catalog/core-trading-spot-trading/api/rest-api/market
-  verification_status: endpoint_schema_verified_fixture_only
-  verification_scope: Endpoint and response mappings checked against sanitized documented ticker response shapes; no live request performed.
+  documentation: https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#klinecandlestick-data
+  verification_status: live_kline_samples_verified
+  verification_scope: BTC-USDT latest and backwards-paginated K-lines live-checked on 2026-10-19 for every declared period. Request parameters, UTC millisecond open times and OHLC mappings also covered by provider integration tests. Ticker mappings retain documented fixture verification only; other symbols are not live-verified.
